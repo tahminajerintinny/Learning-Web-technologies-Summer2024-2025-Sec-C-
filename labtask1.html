@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>First HTML Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        table {
+            width: 80%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            background-color: white;
+           
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 15px;
+            vertical-align: top;
+        }
+
+        
+
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            
+            padding: 10px;
+        }
+
+        .sidebar a, .external-links a {
+            display: block;
+            margin-bottom: 10px;
+            color: blue;
+            text-decoration: none;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+<table>
+    <!-- Header -->
+    <tr>
+        <td colspan="3" class="header">First HTML Site</td>
+    </tr>
+
+    <!-- Body -->
+    <tr>
+        <!-- Left Links -->
+        <td class="sidebar" style="width: 20%;">
+            <div class="section-title">Links</div>
+            <a href="page1.html">Page-1</a>
+            <a href="page2.html">Page-2</a>
+        </td>
+
+        <!-- Center Content -->
+        <td style="width: 60%;">
+            <h3>Page-1</h3>
+            <p>I am at page-1</p>
+        </td>
+
+        <!-- Right Links -->
+        <td class="external-links" style="width: 20%;">
+            <div class="section-title">External Links</div>
+            <a href="https://www.google.com" target="_blank">Google</a>
+            <a href="https://www.yahoo.com" target="_blank">Yahoo</a>
+            <a href="https://www.microsoft.com" target="_blank">Microsoft</a>
+        </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+        <td colspan="3" class="footer">Copyright</td>
+    </tr>
+</table>
+
+</body>
+</html>
