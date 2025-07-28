@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Name </title>
+</head>
+
+<body>
+
+    <h3>Name Field</h3>
+    <form method="post" action="abc.html" enctype="multipart/form-data" onsubmit="return validateName()">
+        <fieldset>
+            Name: <br> <input type="text" name="name" value="" id="name" onblur="validateName()">
+            <p id="nError" style="color:red;"></p>
+            <input type="submit" value="Submit">
+            <p id="success"></p>
+        </fieldset>
+    </form>
+
+    <script>
+        function validateName() {
+            let nInput = document.getElementById('name').value.trim();
+            let nError = document.getElementById('nError');
+
+            if (nInput === "") {
+                nError.innerHTML = "Name cannot be empty.";
+                return false;
+            }
+
+            let firstChar = nInput.charAt(0);
+            if (!((firstChar >= 'A' && firstChar <= 'Z') || (firstChar >= 'a' && firstChar <= 'z'))) {
+                nError.innerHTML = "Name must start with a letter.";
+                return false;
+            }
+
+         
+            let words = nInput.split(' ').filter(function(word) {
+                return word !== '';
+            });
+
+            if (words.length < 2) {
+                nError.innerHTML = "Name must contain at least two words.";
+                return false;
+            }
+
+            for (let i = 0; i < nInput.length; i++) {
+                let ch = nInput.charAt(i);
+                if (!(
+                    (ch >= 'A' && ch <= 'Z') ||
+                    (ch >= 'a' && ch <= 'z') ||
+                    ch === '.' || ch === '-' || ch === ' '
+                )) {
+                    nError.innerHTML = "Name can only contain letters, dot (.), dash (-), and spaces.";
+                    return false;
+                }
+            }
+
+            nError.innerHTML = "";
+            return true;
+        }
+    </script>
+</body>
+
+</html>
