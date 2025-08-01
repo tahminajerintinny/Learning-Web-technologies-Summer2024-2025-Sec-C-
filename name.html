@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Name Validation</title>
+  <style>
+    .error-message { color: red; font-size: 0.9em; margin-top: 5px; }
+  </style>
+  <script>
+    function validateAndRedirect() {
+      const nameInput = document.getElementById("name");
+      const errorDisplay = document.getElementById("error");
+      const nameValue = nameInput.value.trim();
+      errorDisplay.textContent = "";
+
+      // 1. Cannot be empty
+      if (nameValue === "") {
+        errorDisplay.textContent = "Name cannot be empty.";
+        return false;
+      }
+      
+      // 2. Contains at least two words (strictly no regex)
+      let wordCount = 0;
+      let inWord = false;
+      for (let i = 0; i < nameValue.length; i++) {
+        const char = nameValue[i];
+        if (char === ' ') {
+          if (inWord) inWord = false;
+        } else {
+          if (!inWord) {
+            wordCount++;
+            inWord = true;
+          }
+        }
+      }
+
+      if (wordCount < 2) {
+        errorDisplay.textContent = "Name must contain at least two words.";
+        return false;
+      }
+      
+      // 3. Must start with a letter
+      const firstChar = nameValue[0];
+      if (!((firstChar >= 'a' && firstChar <= 'z') || (firstChar >= 'A' && firstChar <= 'Z'))) {
+        errorDisplay.textContent = "Name must start with a letter.";
+        return false;
+      }
+      
+      // 4. Can contain a-z or A-Z or dot(.) or dash(-)
+      for (let i = 0; i < nameValue.length; i++) {
+        const ch = nameValue[i];
+        const isLetter = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+        const isSymbol = (ch === '.' || ch === '-' || ch === ' ');
+        if (!isLetter && !isSymbol) {
+          errorDisplay.textContent = "Name can only contain letters, dots, dashes, or spaces.";
+          return false;
+        }
+      }
+
+      // If all validation passes, redirect
+      window.location.href = "email_validation.html";
+      return false; // Prevent default form submission
+    }
+    
+    function clearForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("error").textContent = "";
+    }
+  </script>
+</head>
+<body>
+  <h2>1. Name Validation</h2>
+  <form onsubmit="return validateAndRedirect()">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="fullName"><br>
+    <p id="error" class="error-message"></p>
+    <button type="submit">Submit</button>
+    <button type="button" onclick="clearForm()">Clear</button>
+  </form>
+</body>
+</html>
