@@ -88,7 +88,7 @@
             lastInputIsOperator = false;
             updateDisplay();
           } catch (e) {
-            currentInput = 'Error';
+            currentInput = 'Infinity';
             updateDisplay();
           }
           return;
