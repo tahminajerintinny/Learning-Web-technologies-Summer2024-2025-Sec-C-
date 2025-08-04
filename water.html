@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Hydration Tracker</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+  nav button {
+    margin-right: 5px;
+    padding: 8px 12px;
+    border: none;
+    background: #2196F3;
+    color: white;
+    cursor: pointer;
+  }
+  nav button.active { background: #0b63ce; }
+  section { display: none; margin-top: 20px; }
+  section.active { display: block; }
+  input[type=number] {
+    width: 50px;
+    padding: 4px;
+  }
+  button.log {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+  }
+  th {
+    background: #2196F3;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <button id="btnTracker" class="active">Tracker</button>
+  <button id="btnReminder">Reminder</button>
+  <button id="btnHistory">History</button>
+</nav>
+
+<section id="tracker" class="active">
+  <h2>Hydration Tracker</h2>
+  <label>
+    Daily Goal (glasses):
+    <input type="number" id="goalInput" min="1" max="50" value="8" />
+  </label>
+  <button id="setGoalBtn">Set Goal</button>
+
+  <div>
+    <button class="log" id="logGlassBtn">Log a Glass</button>
+  </div>
+
+  <p id="progress">0 / 8 glasses logged</p>
+</section>
+
+<section id="reminder">
+  <h2>Reminder Setup</h2>
+  <label>
+    Reminder interval (minutes):
+    <input type="number" id="reminderInterval" min="10" max="180" value="60" />
+  </label>
+  <button id="setReminderBtn">Set Reminder</button>
+  <p id="reminderStatus"></p>
+  <p id="notifWarning" style="color:red;"></p>
+</section>
+
+<section id="history">
+  <h2>History</h2>
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Glasses Logged</th></tr>
+    </thead>
+    <tbody id="historyBody">
+    </tbody>
+  </table>
+</section>
+
+<script>
+  // Tab switching
+  const tabs = {
+    btnTracker: 'tracker',
+    btnReminder: 'reminder',
+    btnHistory: 'history'
+  };
+  Object.keys(tabs).forEach(btnId => {
+    document.getElementById(btnId).onclick = () => {
+      Object.keys(tabs).forEach(id => document.getElementById(id).classList.remove('active'));
+      document.getElementById(btnId).classList.add('active');
+      Object.values(tabs).forEach(sec => document.getElementById(sec).classList.remove('active'));
+      document.getElementById(tabs[btnId]).classList.add('active');
+    };
+  });
+
+  const goalInput = document.getElementById('goalInput');
+  const setGoalBtn = document.getElementById('setGoalBtn');
+  const logGlassBtn = document.getElementById('logGlassBtn');
+  const progress = document.getElementById('progress');
+  const reminderIntervalInput = document.getElementById('reminderInterval');
+  const setReminderBtn = document.getElementById('setReminderBtn');
+  const reminderStatus = document.getElementById('reminderStatus');
+  const notifWarning = document.getElementById('notifWarning');
+  const historyBody = document.getElementById('historyBody');
+
+  const KEY_GOAL = 'waterGoal';
+  const KEY_LOGS = 'waterLogs';
+  const KEY_HISTORY = 'waterHistory';
+  const KEY_REMINDER = 'waterReminder';
+
+  let dailyGoal = 8;
+  let glassesLogged = 0;
+  let reminderInterval = 60;
+  let reminderTimer = null;
+
+  function saveGoal(goal) {
+    localStorage.setItem(KEY_GOAL, goal);
+  }
+  function loadGoal() {
+    return parseInt(localStorage.getItem(KEY_GOAL)) || 0;//chege it 8 to 0
+  }
+  function saveLogs(count) {
+    localStorage.setItem(KEY_LOGS, count);
+  }
+  function loadLogs() {
+    return parseInt(localStorage.getItem(KEY_LOGS)) || 0;
+  }
+  function saveHistory(history) {
+    localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+  }
+  function loadHistory() {
+    return JSON.parse(localStorage.getItem(KEY_HISTORY)) || {};
+  }
+  function saveReminder(interval) {
+    localStorage.setItem(KEY_REMINDER, interval);
+  }
+  function loadReminder() {
+    return parseInt(localStorage.getItem(KEY_REMINDER)) || 60;
+  }
+
+  function updateProgressText() {
+    progress.textContent = `${glassesLogged} / ${dailyGoal} glasses logged`;
+  }
+
+  function updateHistoryTable() {
+    const history = loadHistory();
+    historyBody.innerHTML = '';
+    const dates = Object.keys(history).sort((a,b) => b.localeCompare(a));
+    if (dates.length === 0) {
+      historyBody.innerHTML = `<tr><td colspan="2">No history</td></tr>`;
+      return;
+    }
+    dates.forEach(date => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${date}</td><td>${history[date]}</td>`;
+      historyBody.appendChild(tr);
+    });
+  }
+
+  logGlassBtn.onclick = () => {
+    if (glassesLogged < dailyGoal) {
+      glassesLogged++;
+      updateProgressText();
+      saveLogs(glassesLogged);
+    }
+  };
+
+  setGoalBtn.onclick = () => {
+    const val = parseInt(goalInput.value);
+    if (isNaN(val) || val < 1 || val > 20) {
+      alert('Goal must be between 1 and 20');
+      return;
+    }
+    dailyGoal = val;
+    glassesLogged = 0;
+    updateProgressText();
+    saveGoal(dailyGoal);
+    saveLogs(glassesLogged);
+    alert(`Daily goal set to ${dailyGoal}`);
+  };
+
+  setReminderBtn.onclick = () => {
+    const val = parseInt(reminderIntervalInput.value);
+    if (isNaN(val) || val < 10 || val > 180) {
+      alert('Reminder interval must be between 10 and 180 minutes');
+      return;
+    }
+    reminderInterval = val;
+    saveReminder(reminderInterval);
+    setupReminder();
+    alert(`Reminder set every ${reminderInterval} minutes`);
+  };
+
+  function setupReminder() {
+    if (reminderTimer) clearInterval(reminderTimer);
+    if (!("Notification" in window)) {
+      notifWarning.textContent = "Notifications not supported.";
+      return;
+    }
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if(permission !== 'granted') {
+          notifWarning.textContent = "Please allow notifications.";
+        } else {
+          notifWarning.textContent = '';
+        }
+      });
+    }
+    reminderTimer = setInterval(() => {
+      if (Notification.permission === "granted") {
+        if (glassesLogged < dailyGoal / 2) {
+          new Notification("Hydration Reminder", {
+            body: "You are behind on your water intake."
+          });
+        }
+      }
+    }, reminderInterval * 60 * 1000);
+    reminderStatus.textContent = `Reminder every ${reminderInterval} minutes`;
+  }
+
+  window.addEventListener('beforeunload', () => {
+    const history = loadHistory();
+    const today = new Date().toISOString().slice(0,10);
+    history[today] = glassesLogged;
+    saveHistory(history);
+  });
+
+  function init() {
+    dailyGoal = loadGoal();
+    glassesLogged = loadLogs();
+    reminderInterval = loadReminder();
+
+    goalInput.value = dailyGoal;
+    reminderIntervalInput.value = reminderInterval;
+    updateProgressText();
+    updateHistoryTable();
+    setupReminder();
+  }
+
+  init();
+</script>
+
+</body>
+</html>
