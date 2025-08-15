@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            text-align: center;
+        }
+        input, select, button {
+            width: 90%;
+            margin: 8px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <h2>Calculator</h2>
+    <form id="calForm">
+        <input type="text" id="num1" placeholder="Enter first number">
+        <input type="text" id="num2" placeholder="Enter second number">
+        <select id="operator">
+            <option value="">--Select Operation--</option>
+            <option value="+">Addition (+)</option>
+            <option value="-">Subtraction (-)</option>
+            <option value="*">Multiplication (*)</option>
+            <option value="/">Division (/)</option>
+        </select>
+        <button type="submit">Calculate</button>
+        <div class="error" id="error"></div>
+        <div id="result"></div>
+    </form>
+</div>
+
+<script>
+document.getElementById("calForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    let num1 = document.getElementById("num1").value.trim();
+    let num2 = document.getElementById("num2").value.trim();
+    let operator = document.getElementById("operator").value;
+    let error = document.getElementById("error");
+    let result = document.getElementById("result");
+
+    error.textContent = "";
+    result.textContent = "";
+
+  
+    if (num1 === "" || num2 === "") {
+        error.textContent = "Please enter both numbers.";
+        return;
+    }
+    if (isNaN(num1) || isNaN(num2)) {
+        error.textContent = "Please enter valid numbers.";
+        return;
+    }
+    if (operator === "") {
+        error.textContent = "Please select an operation.";
+        return;
+    }
+
+    
+    num1 = parseFloat(num1);
+    num2 = parseFloat(num2);
+
+    let calResult;
+    if (operator === "+") {
+        calResult = num1 + num2;
+    } else if (operator === "-") {
+        calResult = num1 - num2;
+    } else if (operator === "*") {
+        calResult = num1 * num2;
+    } else if (operator === "/") {
+        if (num2 === 0) {
+            error.textContent = "Cannot divide by zero.";
+            return;
+        }
+        calResult = num1 / num2;
+    }
+
+    result.textContent = "Result: " + calResult;
+});
+</script>
+
+</body>
+</html>
